@@ -23,7 +23,7 @@ public class RS {
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public String sda2() {
+	public String rs() {
 		return "<html><head><title>COMP 4601</title></head><body><h1>"+ name +"</h1></body></html>";
 	}
 	
