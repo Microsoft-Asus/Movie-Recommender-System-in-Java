@@ -63,5 +63,6 @@
 	<classpathentry kind="lib" path="lib/javaml-0.1.7.jar"/>
 	<classpathentry kind="lib" path="lib/libsvm.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-misc-4.5.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

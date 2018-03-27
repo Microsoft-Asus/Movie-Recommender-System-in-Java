@@ -29,11 +29,10 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.apache.lucene.misc.HighFreqTerms;
-
+import org.apache.lucene.misc.*;
 
 public class Lucene {
-	private static final String INDEX_DIR =  "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/Lucene"; 
+	private static final String INDEX_DIR =  "/Users/julianclayton/Documents/workspace/COMP4601-A2/Lucene"; 
 	private static final String FILES__DIR = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/reviews";
 	private static final String USER_PATH = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/users";
 	private static FSDirectory dir;
@@ -114,7 +113,7 @@ public class Lucene {
 			 	if	(writer	!=	null)	{	
 					writer.close();	
 			 	}
-			 	if	(dir	!=	null)	{
+			 	if	(dir    !=	null)	{
 					dir.close();	
 			 	}
 			 } catch (IOException	e)	{	
@@ -168,6 +167,7 @@ public class Lucene {
 		try	{	
 			
 			dir = FSDirectory.open(new File(INDEX_DIR));	
+			@SuppressWarnings("deprecation")
 			IndexReader reader = IndexReader.open(dir);
 			IndexSearcher searcher = new IndexSearcher(reader);
 			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
@@ -211,7 +211,7 @@ public class Lucene {
 			e.printStackTrace();
 		}	
 		return 0.0f;
-		}
+	}
 
 	public final class DocFreqComparator implements Comparator<org.apache.lucene.misc.TermStats> {
 	    
@@ -220,5 +220,10 @@ public class Lucene {
 	      return res;
 	    }
 	}
-	
+	public static void main(String[] args) {
+		Lucene luc = Lucene.getInstance();
+		//luc.indexLucene();
+		Float test = luc.query("A1A69DJ2KPU4CH", "good");
+		System.out.println(test);
+	}
 }
