@@ -68,7 +68,7 @@ public class MovieParser {
 		Elements elements = document.select("p");
 		String allReviewTextForMovie = "";
 		for (Element e : elements) {
-			allReviewTextForMovie += e.toString();
+			allReviewTextForMovie += e.text();
 		}
 		return allReviewTextForMovie;
 	}

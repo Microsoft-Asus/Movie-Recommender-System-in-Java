@@ -15,6 +15,8 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.model.GenreReviews;
+import edu.carleton.comp4601.model.GenreReviews.GenreReview;
 import edu.carleton.comp4601.model.Movie;
 
 
@@ -23,6 +25,7 @@ public class DatabaseManager {
 	private final String MOV_COL = "movies";
 	private final String DOC_NUM_COL = "docnum";
 	private final String REVIEW_COL = "reviews";
+	private final String DICT_COL = "dictionaries";
 	
 	private MongoClient	m;
 	private DBCollection col;
@@ -103,7 +106,6 @@ public class DatabaseManager {
 		DBObject obj = null;
 		while(cursor.hasNext()) {
 			obj = cursor.next();
-		    List<Document> lineaCompra = (List<Document>) obj.get("lineaCompra");
 			Movie movie = new Movie(
 					(String)obj.get("id"),
 					(String)obj.get("name"),
@@ -139,5 +141,26 @@ public class DatabaseManager {
 			col.save(obj);
 		}
 	}
-	
+	public void loadReviews() {
+		switchCollection(REVIEW_COL);
+		GenreReviews gr = GenreReviews.getInstance();
+		DBCursor cursor = col.find();
+		ArrayList<GenreReview> movies = new ArrayList<GenreReview>();
+		DBObject obj = null;
+		while (cursor.hasNext()) {
+			obj = cursor.next();
+			gr.addReview(
+					(String) obj.get("genre"), 
+					(String) obj.get("reviews"));
+		}
+	}
+	public void addDictionaryToDb(ArrayList<String> words, GenreReview r) {
+		switchCollection(DICT_COL);
+		DBObject obj = BasicDBObjectBuilder
+				.start("genre", r.getGenre())
+				.add("dict", words)
+				.get();
+
+		col.save(obj);
+	}
 }
