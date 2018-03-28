@@ -21,16 +21,23 @@ public class MovieSearcher {
 	private final static String API_KEY_PARAM = "&apikey=";
 	static String genre;
 	
-	public static List<String> searchForMovie(String title) throws IOException {
-			title = title.replaceAll(" ", "+");
-		    URL url = new URL(BASE_URL + TITLE_QUERY + title + API_KEY_PARAM + apiKey);
-		    HttpURLConnection request = (HttpURLConnection) url.openConnection();
-		    request.connect();
-		    JsonParser jp = new JsonParser(); 
-		    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); 
-		    JsonObject rootobj = root.getAsJsonObject();  
-		    genre = rootobj.get("Genre").getAsString();
-		    List<String> genres =Arrays.asList(genre.split("\\s*,\\s*"));
+	public static List<String> searchForMovie(String title)  {
+			List<String> genres = null;
+			try {
+				title = title.replaceAll(" ", "+");
+			    URL url = new URL(BASE_URL + TITLE_QUERY + title + API_KEY_PARAM + apiKey);
+			    HttpURLConnection request = (HttpURLConnection) url.openConnection();
+			    request.connect();
+			    JsonParser jp = new JsonParser(); 
+			    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); 
+			    JsonObject rootobj = root.getAsJsonObject();  
+			    genre = rootobj.get("Genre").getAsString();
+			    genres =Arrays.asList(genre.split("\\s*,\\s*"));
+			} catch (NullPointerException e) {
+				System.out.println("Could not get genre for: " + title);
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 		    return genres;
 	}
 	public static void main(String[] args) throws IOException {

@@ -1,8 +1,8 @@
 package edu.carleton.comp4601.RS.db;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -13,14 +13,19 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
+
+import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.model.GenreReviews;
+import edu.carleton.comp4601.model.GenreReviews.GenreReview;
+import edu.carleton.comp4601.model.Movie;
 
 
 public class DatabaseManager {
 	
-	private final String USER_COL = "users";
 	private final String MOV_COL = "movies";
 	private final String DOC_NUM_COL = "docnum";
+	private final String REVIEW_COL = "reviews";
+	private final String DICT_COL = "dictionaries";
 	
 	private MongoClient	m;
 	private DBCollection col;
@@ -58,12 +63,14 @@ public class DatabaseManager {
 		col.insert(newDocId);
 	}
 		
-	public void addMovieToDb(String id, String title) {
+	public void addMovieToDb(String id, String title, String review, List<String> genres) {
 		incrementDocNum();
 		switchCollection(MOV_COL);
 		DBObject obj = BasicDBObjectBuilder
 				.start("id", id)
 				.add("name", title)
+				.add("genres", genres)
+				.add("reviews", review)
 				.get();
 
 		col.save(obj);
@@ -92,6 +99,25 @@ public class DatabaseManager {
 		col = db.getCollection(collection);
 	}
 	
+	public ArrayList<Movie> loadMovies() {
+		switchCollection(MOV_COL);
+		DBCursor cursor = col.find();
+		ArrayList<Movie> movies = new ArrayList<Movie>();
+		DBObject obj = null;
+		while(cursor.hasNext()) {
+			obj = cursor.next();
+			Movie movie = new Movie(
+					(String)obj.get("id"),
+					(String)obj.get("name"),
+					(List<String>) obj.get("genres"),
+					(String)obj.get("reviews")
+					);
+			movies.add(movie);
+		}
+		
+		return movies;
+	}
+
 	public boolean dropMovies() {
 		switchCollection(MOV_COL);
 		BasicDBObject document = new BasicDBObject();
@@ -104,6 +130,37 @@ public class DatabaseManager {
 		}
 		return success;
 	}
-
 	
+	public void writeReviewsToDb(HashMap<String, String> reviews) {
+		switchCollection(REVIEW_COL);
+		for (String genre : reviews.keySet()) {
+			DBObject obj = BasicDBObjectBuilder
+					.start("genre", genre)
+					.add("reviews", reviews.get(genre))
+					.get();
+			col.save(obj);
+		}
+	}
+	public void loadReviews() {
+		switchCollection(REVIEW_COL);
+		GenreReviews gr = GenreReviews.getInstance();
+		DBCursor cursor = col.find();
+		ArrayList<GenreReview> movies = new ArrayList<GenreReview>();
+		DBObject obj = null;
+		while (cursor.hasNext()) {
+			obj = cursor.next();
+			gr.addReview(
+					(String) obj.get("genre"), 
+					(String) obj.get("reviews"));
+		}
+	}
+	public void addDictionaryToDb(ArrayList<String> words, GenreReview r) {
+		switchCollection(DICT_COL);
+		DBObject obj = BasicDBObjectBuilder
+				.start("genre", r.getGenre())
+				.add("dict", words)
+				.get();
+
+		col.save(obj);
+	}
 }

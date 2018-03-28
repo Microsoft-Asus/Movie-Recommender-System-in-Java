@@ -1,0 +1,10 @@
+Step one: Establish dictionaries for several genres
+- This might be done by using Amazon reviews
+
+==============================
+Step two: Run these dictionaries against the reviews done by each user. This will give the user the FEATURES
+
+===============================
+Step three: User the features to develop clusters of users and assign their most similar genre to the user.
+==============================
+Step four: 
