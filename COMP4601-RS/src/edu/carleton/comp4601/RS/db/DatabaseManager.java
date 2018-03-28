@@ -1,5 +1,4 @@
 package edu.carleton.comp4601.RS.db;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +13,16 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
+
+import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.model.Movie;
 
 
 public class DatabaseManager {
 	
-	private final String USER_COL = "users";
 	private final String MOV_COL = "movies";
 	private final String DOC_NUM_COL = "docnum";
+	private final String REVIEW_COL = "reviews";
 	
 	private MongoClient	m;
 	private DBCollection col;
@@ -95,6 +96,26 @@ public class DatabaseManager {
 		col = db.getCollection(collection);
 	}
 	
+	public ArrayList<Movie> loadMovies() {
+		switchCollection(MOV_COL);
+		DBCursor cursor = col.find();
+		ArrayList<Movie> movies = new ArrayList<Movie>();
+		DBObject obj = null;
+		while(cursor.hasNext()) {
+			obj = cursor.next();
+		    List<Document> lineaCompra = (List<Document>) obj.get("lineaCompra");
+			Movie movie = new Movie(
+					(String)obj.get("id"),
+					(String)obj.get("name"),
+					(List<String>) obj.get("genres"),
+					(String)obj.get("reviews")
+					);
+			movies.add(movie);
+		}
+		
+		return movies;
+	}
+
 	public boolean dropMovies() {
 		switchCollection(MOV_COL);
 		BasicDBObject document = new BasicDBObject();
@@ -107,6 +128,16 @@ public class DatabaseManager {
 		}
 		return success;
 	}
-
+	
+	public void writeReviewsToDb(HashMap<String, String> reviews) {
+		switchCollection(REVIEW_COL);
+		for (String genre : reviews.keySet()) {
+			DBObject obj = BasicDBObjectBuilder
+					.start("genre", genre)
+					.add("reviews", reviews.get(genre))
+					.get();
+			col.save(obj);
+		}
+	}
 	
 }
