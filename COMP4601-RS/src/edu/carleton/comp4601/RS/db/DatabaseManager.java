@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,12 +59,14 @@ public class DatabaseManager {
 		col.insert(newDocId);
 	}
 		
-	public void addMovieToDb(String id, String title) {
+	public void addMovieToDb(String id, String title, String review, List<String> genres) {
 		incrementDocNum();
 		switchCollection(MOV_COL);
 		DBObject obj = BasicDBObjectBuilder
 				.start("id", id)
 				.add("name", title)
+				.add("genres", genres)
+				.add("reviews", review)
 				.get();
 
 		col.save(obj);

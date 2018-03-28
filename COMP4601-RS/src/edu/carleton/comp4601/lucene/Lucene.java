@@ -223,7 +223,7 @@ public class Lucene {
 	public static void main(String[] args) {
 		Lucene luc = Lucene.getInstance();
 		//luc.indexLucene();
-		Float test = luc.query("A1A69DJ2KPU4CH", "good");
-		System.out.println(test);
+
+
 	}
 }
