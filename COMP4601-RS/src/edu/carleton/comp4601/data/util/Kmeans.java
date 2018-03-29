@@ -22,6 +22,9 @@ public class Kmeans {
 	HashMap<String, ArrayList<UserProfile>>  clusters;
 	ArrayList<double[]> centroids;
 	boolean firstIteration;
+	
+	private static final int HUGE_NUMBER = 10000000;
+	private static final float threshold = 0.00001f;
 	/*
 	 * Constructor that reads the data in from a file.
 	 * You must specify the number of clusters.
@@ -70,7 +73,7 @@ public class Kmeans {
 		for (int i = 0; i < no_clusters; i++){
 			Random rand = new Random();
 			int  n = rand.nextInt(usersCopy.size());
-			centroids.add(usersCopy.get(n).getFeatures());
+			centroids.add(usersCopy.get(n).getNewFeatures());
 			usersCopy.remove(n);
 			clusters.put(CLUSTER + i,  new ArrayList<UserProfile>());
 		}
@@ -83,8 +86,8 @@ public class Kmeans {
 				double minDistance = 30000;
 				int cIndex = 0;
 				for (int i = 0; i < centroids.size(); i++) {
-					if (distance(user.getFeatures(), centroids.get(i)) < minDistance) {
-						minDistance = distance(user.getFeatures(), centroids.get(i));
+					if (distance(user.getNewFeatures(), centroids.get(i)) < minDistance) {
+						minDistance = distance(user.getNewFeatures(), centroids.get(i));
 						cIndex = i;
 					}
 				}
@@ -105,7 +108,7 @@ public class Kmeans {
 			boolean converged = true;
 			for (int i = 0; i < centroids.size(); i++) {
 				double diff = distance(centroids.get(i), oldCentroids.get(i));
-					if (!(diff < 0.00001) || !(diff > -0.0001)) {
+					if (!(diff < threshold) || !(diff > -threshold)) {
 						converged = false;
 				}
 			}
@@ -136,10 +139,10 @@ public class Kmeans {
 	private double[] findNewCentroid(int cluster) {
 		ArrayList<UserProfile> usersInCluster = getUsersInCluster(cluster);
 		double[] features = null;
-		int featuresize =  usersInCluster.get(0).getFeatures().length;
+		int featuresize =  usersInCluster.get(0).getNewFeatures().length;
 		Matrix allFeatures = new Matrix(usersInCluster.size(), featuresize);
 		for (int i = 0; i < usersInCluster.size(); i++) {
-			features = usersInCluster.get(i).getFeatures();
+			features = usersInCluster.get(i).getNewFeatures();
 			for (int j = 0; j < features.length; j++) {
 				allFeatures.getArray()[i][j] = features[j];
 			}
@@ -176,18 +179,18 @@ public class Kmeans {
 	private double distance(UserProfile a, UserProfile b) {
 		double rtn = 0.0;
 		// Assumes a and b have same number of features
-		for (int i = 0; i < a.getFeatures().length; i++) {
-			rtn += (a.getFeatures()[i] - b.getFeatures()[i])
-					* (a.getFeatures()[i] - b.getFeatures()[i]);
+		for (int i = 0; i < a.getNewFeatures().length; i++) {
+			rtn += (a.getNewFeatures()[i] - b.getNewFeatures()[i])
+					* (a.getNewFeatures()[i] - b.getNewFeatures()[i]);
 		}
 		return Math.sqrt(rtn);
 	}
 	private static double distance2(UserProfile a, UserProfile b) {
 		double rtn = 0.0;
 		// Assumes a and b have same number of features
-		for (int i = 0; i < a.getFeatures().length; i++) {
-			rtn += (a.getFeatures()[i] - b.getFeatures()[i])
-					* (a.getFeatures()[i] - b.getFeatures()[i]);
+		for (int i = 0; i < a.getNewFeatures().length; i++) {
+			rtn += (a.getNewFeatures()[i] - b.getNewFeatures()[i])
+					* (a.getNewFeatures()[i] - b.getNewFeatures()[i]);
 		}
 		return Math.sqrt(rtn);
 	}

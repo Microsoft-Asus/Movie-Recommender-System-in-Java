@@ -2,12 +2,11 @@ package edu.carleton.comp4601.users;
 
 import java.util.ArrayList;
 
-import Jama.Matrix;
 import edu.carleton.comp4601.dictonary.DictionaryAndFeatureGenerator;
 import edu.carleton.comp4601.lucene.Lucene;
-import edu.carleton.comp4601.model.GenreReviews;
-import net.sf.javaml.clustering.Clusterer;
-import net.sf.javaml.clustering.KMeans;
+import net.sf.javaml.utils.ArrayUtils;
+import weka.core.Utils;
+
 
 public class UserProfile {
 	
@@ -30,8 +29,35 @@ public class UserProfile {
 	public String getUsername() {
 		return username;
 	}
+	private  double[] sortArray(double[] arr) {
+	    for (int i = 0; i <arr.length-1; i++) {
+	        for (int j = 1; j <arr.length-i; j++) {
+	            if(arr[j-1]>arr[j]) {
+	                double temp = arr[j-1];
+	                arr[j-1] = arr[j];
+	                arr[j] = temp;
+	            }
+	        }
+	    }
+	    return arr;
+	}
+	public int getArrayIndex(double[] arr,double value) {
+	    for(int i=0;i<arr.length;i++)
+	        if(arr[i]==value) return i;
+	    return -1;
+	}
 	public double[] getFeatures() {
 		return features;
+	}
+	public double[] getNewFeatures() {
+		double[] featuresSorted = sortArray(features.clone());
+		ArrayUtils.reverse(featuresSorted);
+		double[] newfeatures = new double[features.length];
+		
+		for (int i = 0; i < featuresSorted.length; i++) {
+			newfeatures[getArrayIndex(features, featuresSorted[i])] = i;
+		}
+		return newfeatures;
 	}
 	public void generateFeature(ArrayList<String> dict, String genre) {
 		float accum = 0;
@@ -46,6 +72,17 @@ public class UserProfile {
 	}
 	public int getCluster() {
 		return cluster;
+	}
+	public String getFavouriteGenre() {
+		double largestVal = 0;
+		int index = 0;
+		for (int i = 0; i < features.length; i++) {
+			if (largestVal < features[i]) {
+				largestVal = features[i];
+				index = i;
+			}
+		}
+		return DictionaryAndFeatureGenerator.GENRES[index];
 	}
 	
 	/** Action Adult Adventure Animation Biography Comedy Crime Documentary Drama Family Fantasy Film-Noir Game-Show History Horror Musical Music Mystery News Reality-TV Romance Sci-Fi Short Sport Talk-Show Thriller War Western**/
