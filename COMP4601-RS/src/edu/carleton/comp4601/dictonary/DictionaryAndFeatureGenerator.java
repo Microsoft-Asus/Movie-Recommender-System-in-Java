@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.carleton.comp4601.RS.db.DatabaseManager;
+import edu.carleton.comp4601.data.util.Kmeans;
 import edu.carleton.comp4601.lucene.Lucene;
 import edu.carleton.comp4601.model.Dictionary;
 import edu.carleton.comp4601.model.GenreReviews;
@@ -22,17 +23,17 @@ import edu.carleton.comp4601.model.GenreReviews.GenreReview;
 import edu.carleton.comp4601.model.Movie;
 import edu.carleton.comp4601.users.UserProfile;
 
-public class DictionaryGenerator {
+public class DictionaryAndFeatureGenerator {
 
 	public static final String[] GENRES = {"Drama", "Horror", "Crime", "Sci-Fi", "Action", "Fantasy", "Adventure", "Biography", "History", "Mystery", "Comedy", "Family"};
 	private HashMap<String, String> genreReviewMap;
 	private ArrayList<Movie> movies; 
 	private List<String> stopwords;
 	
-	private static DictionaryGenerator instance;
+	private static DictionaryAndFeatureGenerator instance;
 	
 	
-	public DictionaryGenerator() {
+	public DictionaryAndFeatureGenerator() {
 		try {
 			genreReviewMap = new HashMap<String,String>();
 			stopwords = new ArrayList<String>();
@@ -121,9 +122,9 @@ public class DictionaryGenerator {
 			dbm.saveUserProfileToDatabase(user);
 		}
 	}
-	public static DictionaryGenerator getInstance() {
+	public static DictionaryAndFeatureGenerator getInstance() {
 		if (instance == null)
-			instance = new DictionaryGenerator();
+			instance = new DictionaryAndFeatureGenerator();
 		return instance;
 	}
 	public static int indexOfGenre(String genre) {
@@ -136,8 +137,17 @@ public class DictionaryGenerator {
 		return index;
 	}
 	public static void main(String[] args) {
-		DictionaryGenerator dg = DictionaryGenerator.getInstance();
+		//DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
 		//dg.generateDictionaryForGenres();
-		dg.generateFeaturesForUsers();
+		//dg.generateFeaturesForUsers();
+		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
+		///System.out.println(profiles.size());
+		Kmeans kmeans = new Kmeans(4, profiles);
+		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
+		for (String key : clusters.keySet()){
+			System.out.println(key + ": ");
+			System.out.println("Size: " + clusters.get(key).size());
+			
+		}
 	}
 }
