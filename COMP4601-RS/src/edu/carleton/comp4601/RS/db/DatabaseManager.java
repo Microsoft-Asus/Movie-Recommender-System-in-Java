@@ -15,9 +15,11 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.model.Dictionary;
 import edu.carleton.comp4601.model.GenreReviews;
 import edu.carleton.comp4601.model.GenreReviews.GenreReview;
 import edu.carleton.comp4601.model.Movie;
+import edu.carleton.comp4601.users.UserProfile;
 
 
 public class DatabaseManager {
@@ -26,6 +28,7 @@ public class DatabaseManager {
 	private final String DOC_NUM_COL = "docnum";
 	private final String REVIEW_COL = "reviews";
 	private final String DICT_COL = "dictionaries";
+	private final String USERPROFILE_COL = "userprofiles";
 	
 	private MongoClient	m;
 	private DBCollection col;
@@ -159,6 +162,34 @@ public class DatabaseManager {
 		DBObject obj = BasicDBObjectBuilder
 				.start("genre", r.getGenre())
 				.add("dict", words)
+				.get();
+
+		col.save(obj);
+	}
+	public ArrayList<Dictionary> loadDictionariesFromDb() {
+		switchCollection(DICT_COL);
+		DBCursor cursor = col.find();
+		ArrayList<Dictionary> dictionaries = new ArrayList<Dictionary>();
+		DBObject obj = null;
+
+		while (cursor.hasNext()) {
+			obj = cursor.next();
+			dictionaries.add(new Dictionary(
+					(String) obj.get("genre"), 
+					(ArrayList<String>) obj.get("dict")));
+		}
+		return dictionaries;
+	}
+	public void saveUserProfileToDatabase(UserProfile user) {
+		switchCollection(USERPROFILE_COL);
+		System.out.println("Saving user: " + user.getUsername() + "to the db 2");
+		System.out.println("Features: ");
+		for (int i = 0; i < user.getFeatures().length; i++){
+			System.out.println(user.getFeatures()[i]);
+		}
+		DBObject obj = BasicDBObjectBuilder
+				.start("username", user.getUsername())
+				.add("features", user.getFeatures())
 				.get();
 
 		col.save(obj);
