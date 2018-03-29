@@ -182,16 +182,25 @@ public class DatabaseManager {
 	}
 	public void saveUserProfileToDatabase(UserProfile user) {
 		switchCollection(USERPROFILE_COL);
-		System.out.println("Saving user: " + user.getUsername() + "to the db 2");
-		System.out.println("Features: ");
-		for (int i = 0; i < user.getFeatures().length; i++){
-			System.out.println(user.getFeatures()[i]);
-		}
 		DBObject obj = BasicDBObjectBuilder
 				.start("username", user.getUsername())
 				.add("features", user.getFeatures())
 				.get();
 
 		col.save(obj);
+	}
+	public ArrayList<UserProfile> loadUserProfiles() {
+		switchCollection(USERPROFILE_COL);
+		DBCursor cursor = col.find();
+		DBObject obj = null;
+		ArrayList<UserProfile> userProfiles = new ArrayList<UserProfile>();
+		while (cursor.hasNext()) {
+			obj = cursor.next();
+			ArrayList<Double> list = (ArrayList<Double>) obj.get("features");
+			userProfiles.add(new UserProfile(
+					(String) obj.get("username"),
+					list));
+		}
+		return userProfiles;
 	}
 }

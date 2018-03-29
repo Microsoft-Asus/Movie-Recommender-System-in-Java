@@ -9,16 +9,17 @@ import java.util.Random;
 import java.util.Scanner;
 
 import Jama.Matrix;
+import edu.carleton.comp4601.users.UserProfile;
 
 public class Kmeans {
 
 	private int no_users;
-	private User[] users;
+	private UserProfile[] users;
 	private int no_features;
 	private boolean changed;
 	private int no_clusters;
 	private static final String CLUSTER = "cluster";
-	HashMap<String, ArrayList<User>>  clusters;
+	HashMap<String, ArrayList<UserProfile>>  clusters;
 	ArrayList<double[]> centroids;
 	boolean firstIteration;
 	/*
@@ -30,15 +31,13 @@ public class Kmeans {
 		Scanner s = new Scanner(file);
 		no_users = s.nextInt();
 		no_features = s.nextInt();
-		users = new User[no_users];
+		users = new UserProfile[no_users];
 		this.no_clusters = noClusters;
-		clusters = new HashMap<String, ArrayList<User>>();
+		clusters = new HashMap<String, ArrayList<UserProfile>>();
 		for (int i = 0; i < no_users; i++) {
 			String name = s.next();
-			users[i] = new User(name, no_features, noClusters);
-			for (int j = 0; j < no_features; j++) {
-				users[i].features[j] = s.nextDouble();
-			}
+			//users[i] = new UserProfile(name, no_features, noClusters);
+			
 		}
 		s.close();
 		
@@ -46,44 +45,55 @@ public class Kmeans {
 			System.out.println(users[i].toString());
 		}
 	}
+	public Kmeans(int noClusters, ArrayList<UserProfile> userslist) {
+		changed = true;
+		no_users = userslist.size();
+		users = new UserProfile[no_users];
+		this.no_clusters = noClusters;
+		clusters = new HashMap<String, ArrayList<UserProfile>>();
+		for (int i = 0; i < no_users; i++) {
+			users[i] = userslist.get(i);
+			
+		}
+	}
 
 	/*
 	 * This is where your implementation goes
 	 */
-	private HashMap<String, ArrayList<User>> algorithm() {
+	public HashMap<String, ArrayList<UserProfile>> algorithm() {
 		for (int i = 0; i < no_users; i++) {
 			//System.out.println(users[i].toString());
 		}
-		ArrayList<User>  usersCopy = new ArrayList<User>(Arrays.asList(users));
+		ArrayList<UserProfile>  usersCopy = new ArrayList<UserProfile>(Arrays.asList(users));
 		centroids = new ArrayList<double[]>();
 		
 		for (int i = 0; i < no_clusters; i++){
 			Random rand = new Random();
 			int  n = rand.nextInt(usersCopy.size());
-			centroids.add(usersCopy.get(n).features);
+			centroids.add(usersCopy.get(n).getFeatures());
 			usersCopy.remove(n);
-			clusters.put(CLUSTER + i,  new ArrayList<User>());
+			clusters.put(CLUSTER + i,  new ArrayList<UserProfile>());
 		}
 		int iterations = 0;
 		//Initial clusters 
 		
 		while (changed) {
 			
-			for (User user : users) {
+			for (UserProfile user : users) {
 				double minDistance = 30000;
 				int cIndex = 0;
 				for (int i = 0; i < centroids.size(); i++) {
-					if (distance(user.features, centroids.get(i)) < minDistance) {
-						minDistance = distance(user.features, centroids.get(i));
+					if (distance(user.getFeatures(), centroids.get(i)) < minDistance) {
+						minDistance = distance(user.getFeatures(), centroids.get(i));
 						cIndex = i;
 					}
 				}
 				for (int i = 0; i < clusters.get(CLUSTER + cIndex).size(); i++) {
-					if (clusters.get(CLUSTER + cIndex).get(i).name == user.name) {
+					if (clusters.get(CLUSTER + cIndex).get(i).getUsername() == user.getUsername()) {
 						clusters.get(CLUSTER + cIndex).remove(i);
 					}
 				}
-				user.cluster = cIndex;
+				user.setCluster(cIndex);
 				clusters.get(CLUSTER+cIndex).add(user);
 			}
 			ArrayList<double[]> oldCentroids = centroids;
@@ -102,34 +112,34 @@ public class Kmeans {
 			iterations++;
 			changed=!converged;
 		}
-		clusters = new HashMap<String, ArrayList<User>>();
+		clusters = new HashMap<String, ArrayList<UserProfile>>();
 		for (int i = 0; i < no_clusters; i++){
-			clusters.put(CLUSTER + i,  new ArrayList<User>());
+			clusters.put(CLUSTER + i,  new ArrayList<UserProfile>());
 		}
-		for (User user : users) {
-			clusters.get(CLUSTER + user.cluster).add(user);
+		for (UserProfile user : users) {
+			clusters.get(CLUSTER + user.getCluster()).add(user);
 		}
 		System.out.println("Converged after: " + iterations + " iterations");
 		
 		return clusters;
 	}
-	private ArrayList<User> getUsersInCluster(int cluster) {
-		ArrayList<User> usersInCluster = new ArrayList<User>();
+	private ArrayList<UserProfile> getUsersInCluster(int cluster) {
+		ArrayList<UserProfile> usersInCluster = new ArrayList<UserProfile>();
 		
-		for (User user : users) {
-			if (user.cluster == cluster) {
+		for (UserProfile user : users) {
+			if (user.getCluster() == cluster) {
 				usersInCluster.add(user);
 			}
 		}
 		return usersInCluster;
 	}
 	private double[] findNewCentroid(int cluster) {
-		ArrayList<User> usersInCluster = getUsersInCluster(cluster);
+		ArrayList<UserProfile> usersInCluster = getUsersInCluster(cluster);
 		double[] features = null;
-		int featuresize =  usersInCluster.get(0).features.length;
+		int featuresize =  usersInCluster.get(0).getFeatures().length;
 		Matrix allFeatures = new Matrix(usersInCluster.size(), featuresize);
 		for (int i = 0; i < usersInCluster.size(); i++) {
-			features = usersInCluster.get(i).features;
+			features = usersInCluster.get(i).getFeatures();
 			for (int j = 0; j < features.length; j++) {
 				allFeatures.getArray()[i][j] = features[j];
 			}
@@ -163,59 +173,26 @@ public class Kmeans {
 		}
 		return Math.sqrt(rtn);
 	}
-	private double distance(User a, User b) {
+	private double distance(UserProfile a, UserProfile b) {
 		double rtn = 0.0;
 		// Assumes a and b have same number of features
-		for (int i = 0; i < a.features.length; i++) {
-			rtn += (a.features[i] - b.features[i])
-					* (a.features[i] - b.features[i]);
+		for (int i = 0; i < a.getFeatures().length; i++) {
+			rtn += (a.getFeatures()[i] - b.getFeatures()[i])
+					* (a.getFeatures()[i] - b.getFeatures()[i]);
 		}
 		return Math.sqrt(rtn);
 	}
-	private static double distance2(User a, User b) {
+	private static double distance2(UserProfile a, UserProfile b) {
 		double rtn = 0.0;
 		// Assumes a and b have same number of features
-		for (int i = 0; i < a.features.length; i++) {
-			rtn += (a.features[i] - b.features[i])
-					* (a.features[i] - b.features[i]);
+		for (int i = 0; i < a.getFeatures().length; i++) {
+			rtn += (a.getFeatures()[i] - b.getFeatures()[i])
+					* (a.getFeatures()[i] - b.getFeatures()[i]);
 		}
 		return Math.sqrt(rtn);
 	}
 	// Private class for representing user
-	public class User {
-		public double[] features;
-		public double[] distance;
-		public String name;
-		public int cluster;
-		public int last_cluster;
-
-		public User(String name, int noFeatures, int noClusters) {
-			this.name = name;
-			this.features = new double[noFeatures];
-			this.distance = new double[noClusters];
-			this.cluster = -1;
-			this.last_cluster = -2;
-		}
-
-		// Check if cluster association has changed.
-		public boolean changed() {
-			return last_cluster != cluster;
-		}
-		
-		// Update the saved cluster from iteration to iteration
-		public void update() {
-			last_cluster = cluster;
-		}
-
-		public String toString() {
-			StringBuffer b = new StringBuffer(name);
-			for (int i = 0; i < features.length; i++) {
-				b.append(' ');
-				b.append(features[i]);
-			}
-			return b.toString();
-		}
-	}
+	
 	//Output total distance within all clusters 
 	//for the first one it seems to be around 5/6
 	//for the second time it is around 4/5
@@ -223,13 +200,13 @@ public class Kmeans {
 		try {
 			String fileName = "KNN-1.txt";
 			Kmeans knn = new Kmeans(4, new File(fileName));
-			HashMap<String, ArrayList<User>> clusters = knn.algorithm();
+			HashMap<String, ArrayList<UserProfile>> clusters = knn.algorithm();
 
 			for (String key : clusters.keySet()){
 				System.out.println(key + ": ");
 				System.out.println("Size: " + clusters.get(key).size());
-				for (User user : clusters.get(key)) {
-					System.out.println(user.name);
+				for (UserProfile user : clusters.get(key)) {
+					System.out.println(user.getUsername());
 				}
 			}
 			
