@@ -29,6 +29,7 @@ public class DatabaseManager {
 	private final String REVIEW_COL = "reviews";
 	private final String DICT_COL = "dictionaries";
 	private final String USERPROFILE_COL = "userprofiles";
+	private final String CLUSTERS_COL = "clusters";
 	
 	private MongoClient	m;
 	private DBCollection col;
@@ -202,5 +203,24 @@ public class DatabaseManager {
 					list));
 		}
 		return userProfiles;
+	}
+	private ArrayList<String> getUsernames(ArrayList<UserProfile> userprofiles) {
+		ArrayList<String> usernames = new ArrayList<String>();
+		for (UserProfile userprofile : userprofiles) {
+			usernames.add(userprofile.getUsername());
+		}
+		return usernames;
+	}
+	public void saveClustersToDb(HashMap<String, ArrayList<UserProfile>> clusters) {
+		switchCollection(CLUSTERS_COL);
+		
+		for (String key : clusters.keySet()) {
+			DBObject obj = BasicDBObjectBuilder
+					.start("cluster", key)
+					.add("users", getUsernames(clusters.get(key)))
+					.get();
+	
+			col.save(obj);
+		}
 	}
 }

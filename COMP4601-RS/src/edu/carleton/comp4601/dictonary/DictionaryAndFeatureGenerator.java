@@ -142,12 +142,14 @@ public class DictionaryAndFeatureGenerator {
 		//dg.generateFeaturesForUsers();
 		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		///System.out.println(profiles.size());
-		Kmeans kmeans = new Kmeans(4, profiles);
+		Kmeans kmeans = new Kmeans(10, profiles);
 		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
-		for (String key : clusters.keySet()){
-			System.out.println(key + ": ");
-			System.out.println("Size: " + clusters.get(key).size());
-			
+		//DatabaseManager.getInstance().saveClustersToDb(clusters);
+		for (String key : clusters.keySet()) {
+			System.out.println("=========================> " + key);
+			for (UserProfile userprofile : clusters.get(key)) {
+				System.out.println(userprofile.getUsername() + "'s favourtite genre is: " + userprofile.getFavouriteGenre());
+			}
 		}
 	}
 }
