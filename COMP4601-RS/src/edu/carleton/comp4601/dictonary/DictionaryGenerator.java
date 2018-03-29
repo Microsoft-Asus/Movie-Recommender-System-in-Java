@@ -15,13 +15,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.carleton.comp4601.RS.db.DatabaseManager;
+import edu.carleton.comp4601.lucene.Lucene;
+import edu.carleton.comp4601.model.Dictionary;
 import edu.carleton.comp4601.model.GenreReviews;
 import edu.carleton.comp4601.model.GenreReviews.GenreReview;
 import edu.carleton.comp4601.model.Movie;
+import edu.carleton.comp4601.users.UserProfile;
 
 public class DictionaryGenerator {
 
-	private final String[] GENRES = {"Drama", "Horror", "Crime", "Sci-Fi", "Action", "Fantasy", "Adventure", "Biography", "History", "Mystery", "Comedy", "Family"};
+	public static final String[] GENRES = {"Drama", "Horror", "Crime", "Sci-Fi", "Action", "Fantasy", "Adventure", "Biography", "History", "Mystery", "Comedy", "Family"};
 	private HashMap<String, String> genreReviewMap;
 	private ArrayList<Movie> movies; 
 	private List<String> stopwords;
@@ -60,6 +63,7 @@ public class DictionaryGenerator {
 		DatabaseManager.getInstance().writeReviewsToDb(genreReviewMap);
 	}
 	private void generateDictionaryForGenres() {
+		System.out.println("Starting Dictionary creation...");
 		DatabaseManager dbm = DatabaseManager.getInstance();
 		dbm.loadReviews();
 		ArrayList<GenreReview> reviews = GenreReviews.getInstance().getReviews();
@@ -67,6 +71,8 @@ public class DictionaryGenerator {
 			ArrayList<String> topWords = countWordsInString(review.getReviews());
 			dbm.addDictionaryToDb(topWords, review);
 		}
+        System.out.print("Dictionaries Generated");
+
 		
 	}
 	public ArrayList<String> countWordsInString(String s) {
@@ -97,17 +103,41 @@ public class DictionaryGenerator {
             //System.out.println(entry.getKey() + " " + entry.getValue());
 
         }
-        System.out.print("Counted words");
         return words;
     }
+	public void generateFeaturesForUsers() {
+		System.out.println("Generating Features");
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		ArrayList<String> usernames = Lucene.getInstance().getUsers();
+		ArrayList<Dictionary> dictionaries = dbm.loadDictionariesFromDb();
+		for (String username: usernames) {
+			System.out.println("Generating features for: " + username);
+			UserProfile user = new UserProfile(username);
+			for (Dictionary dict : dictionaries) {
+				System.out.println("For dictionary: " + dict.getGenre());
+				user.generateFeature(dict.getDictionary(), dict.getGenre());
+			}
+			System.out.println("Saving " + user.getUsername() + " to db");
+			dbm.saveUserProfileToDatabase(user);
+		}
+	}
 	public static DictionaryGenerator getInstance() {
 		if (instance == null)
 			instance = new DictionaryGenerator();
 		return instance;
 	}
-	
+	public static int indexOfGenre(String genre) {
+		int index = 0;
+		for (int i = 0; i < GENRES.length; i++) {
+			if (GENRES[i].equals(genre)) {
+				index = i;
+			}
+		}
+		return index;
+	}
 	public static void main(String[] args) {
 		DictionaryGenerator dg = DictionaryGenerator.getInstance();
-		dg.generateDictionaryForGenres();
+		//dg.generateDictionaryForGenres();
+		dg.generateFeaturesForUsers();
 	}
 }
