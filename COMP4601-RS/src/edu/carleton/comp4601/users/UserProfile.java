@@ -2,7 +2,6 @@ package edu.carleton.comp4601.users;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -112,7 +111,6 @@ public class UserProfile {
 		return sum;
 	}
 	private double similarity(double[] featureone, double[] featuretwo) {
-
 
 		Matrix user1  = new Matrix(new double[1][featureone.length]);
 		Matrix user2 = new Matrix (new double[1][featuretwo.length]);

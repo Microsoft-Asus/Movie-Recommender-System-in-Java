@@ -137,9 +137,14 @@ public class Lucene {
 		return stopSet;
 	}
 	
-	private String queryPage(String movieId) throws IOException{
-		String path = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/pages/" + movieId + ".html";
-		String contents = new String(Files.readAllBytes(Paths.get(path))); 		
+	public String queryPage(String movieId) {
+		String contents = null;
+		try {
+			String path =  "/Users/julianclayton/Documents/workspace/COMP4601-A2/COMP4601-RS/data/pages/" + movieId + ".html";
+			contents = new String(Files.readAllBytes(Paths.get(path))); 		
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
 		return contents;	
 	}
 

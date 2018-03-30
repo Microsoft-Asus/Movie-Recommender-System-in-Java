@@ -11,10 +11,11 @@ public class Advertisement {
 	private String title;
 	private double[] features;
 	private String[] genres;
+	private String id;
 	
 	public Advertisement(double[] features) {
 		this.features = features;
-		this.genres = getGenres(features, ADVERTISEMENT_ACCURACY);
+		this.genres = extractGenres(features, ADVERTISEMENT_ACCURACY);
 		this.html = generateHTML();
 	}
 	
@@ -62,7 +63,7 @@ public class Advertisement {
 		}
 		return indexes;
 	}
-	private String[] getGenres(double[] features, int num) {
+	private String[] extractGenres(double[] features, int num) {
 		int[] indexes = getLowestIndexes(num, features);
 		String[] genres = new String[num];
 		for (int i = 0; i < indexes.length; i++) {
@@ -71,5 +72,13 @@ public class Advertisement {
 		
 		return genres;
 	}
-	
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getId() {
+		return id;
+	}
+	public String[] getGenres() {
+		return genres;
+	}
 }

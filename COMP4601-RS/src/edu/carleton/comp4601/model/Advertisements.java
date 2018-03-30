@@ -20,9 +20,18 @@ public class Advertisements {
 	
 	public void addAdvertisement(Advertisement advertisement) {
 		advertisements.add(advertisement);
+		advertisement.setId("C-" + advertisements.indexOf(advertisement));
 	}
 	public ArrayList<Advertisement> getAdvertisements() {
 		return advertisements;
+	}
+	public Advertisement getAdvertisementById(String id) {
+		for (Advertisement a : advertisements) {
+			if (a.getId().equals(id)) {
+				return a;
+			}
+		}
+		return null;
 	}
 
 }

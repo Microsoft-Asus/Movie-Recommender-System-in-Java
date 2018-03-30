@@ -135,19 +135,14 @@ public class DictionaryAndFeatureGenerator {
 		return index;
 	}
 	public static void main(String[] args) {
-		//DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
-		//dg.generateDictionaryForGenres();
+		DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
+		dg.generateDictionaryForGenres();
 		//dg.generateFeaturesForUsers();
-		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
+		//ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		///System.out.println(profiles.size());
-		Kmeans kmeans = new Kmeans(18, profiles);
-		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
+		//Kmeans kmeans = new Kmeans(18, profiles);
+		//HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
 		//DatabaseManager.getInstance().saveClustersToDb(clusters);
-		for (String key : clusters.keySet()) {
-			System.out.println("=========================> " + key);
-			for (UserProfile userprofile : clusters.get(key)) {
-				System.out.println(userprofile.getUsername() + "'s favourtite genre is: " + userprofile.getFavouriteGenre());
-			}
-		}
+		
 	}
 }
