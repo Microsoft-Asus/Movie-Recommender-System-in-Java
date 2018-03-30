@@ -34,9 +34,9 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.misc.*;
 
 public class Lucene {
-	private static final String INDEX_DIR =  "/Users/julianclayton/Documents/workspace/COMP4601-A2/Lucene"; 
-	private static final String FILES__DIR = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/reviews";
-	private static final String USER_PATH = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/users";
+	private static final String INDEX_DIR =  "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/Lucene"; 
+	private static String FILES_DIR; 
+	private static String USER_PATH;
 	private static FSDirectory dir;
 	private static IndexWriter	writer;
 	
@@ -51,9 +51,25 @@ public class Lucene {
 	
 	private static Lucene instance;
 
-	public Lucene (){
+	public Lucene (String directory){
+			FILES_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/" +  directory + "/reviews";
+			USER_PATH = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/"  +  directory + "/users";
+			System.out.println(FILES_DIR);
 			instance = this;	
 			users = new ArrayList<String>();
+	}
+	
+	public Lucene (){
+		FILES_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/data/reviews";
+		USER_PATH = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/data/users";
+		instance = this;	
+		users = new ArrayList<String>();
+}
+	
+	public static  Lucene getInstance(String directory) {
+		if (instance == null)
+			instance = new Lucene(directory);
+		return instance;
 	}
 	
 	public static  Lucene getInstance() {
@@ -102,7 +118,7 @@ public class Lucene {
 		iwc.setOpenMode(OpenMode.CREATE);	
 		writer = new IndexWriter(dir, iwc);	
 		
-		File dir = new File(FILES__DIR);
+		File dir = new File(FILES_DIR);
 		File[] files = dir.listFiles();
 		for (File file : files) {
 			indexADoc(file);
@@ -234,8 +250,7 @@ public class Lucene {
 	    }
 	}
 	public static void main(String[] args) {
-		Lucene luc = Lucene.getInstance();
-	
-		//luc.indexLucene();
+		Lucene luc = Lucene.getInstance("data");
+		luc.indexLucene();
 	}
 }

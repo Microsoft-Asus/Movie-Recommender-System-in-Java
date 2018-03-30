@@ -73,6 +73,25 @@ public class RS {
 		}		
 		return htmlBuilder.toString();
 	}
+	
+	@GET
+	@Path("reset/{DIR}")
+	@Produces(MediaType.TEXT_HTML) 
+	//public String reset(@PathParam("DIR") String directory) {
+	public String reset(@PathParam("DIR") String directory) {
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		
+		Lucene luc = Lucene.getInstance(directory);
+		luc.indexLucene();
+		
+		StringBuilder htmlBuilder = new StringBuilder();
+		htmlBuilder.append("<html>");
+		htmlBuilder.append("<head><title> Reset </title></head>");
+		htmlBuilder.append("<h1> Initializing data at " + directory + " </h1>");
+		
+		return htmlBuilder.toString();
+	}
+	
 	@GET
 	@Path("community")
 	@Produces(MediaType.TEXT_HTML) 
