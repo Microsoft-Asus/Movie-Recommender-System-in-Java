@@ -1,10 +1,14 @@
 package edu.carleton.comp4601.users;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import Jama.Matrix;
 import edu.carleton.comp4601.generators.DictionaryAndFeatureGenerator;
 import edu.carleton.comp4601.lucene.Lucene;
+import edu.carleton.comp4601.model.Advertisement;
+import edu.carleton.comp4601.model.Advertisements;
 import net.sf.javaml.utils.ArrayUtils;
 
 
@@ -91,10 +95,52 @@ public class UserProfile {
 		}
 		return DictionaryAndFeatureGenerator.GENRES[index];
 	}
-	
-	/** Action Adult Adventure Animation Biography Comedy Crime Documentary Drama Family Fantasy Film-Noir Game-Show History Horror Musical Music Mystery News Reality-TV Romance Sci-Fi Short Sport Talk-Show Thriller War Western**/
+	private double average(double[] user) {
+		double accum = 0;
+		for (int i = 0; i < user.length; i++) {
+			accum += user[i];
+		}
+		return accum / (user.length);
+	}
+	private double multiplyIndividualValuesAndSum(Matrix a, Matrix b) {
+		double sum = 0;
+		for (int i = 0; i < a.getArray()[0].length; i++) {
+			sum += a.getArray()[0][i] * b.getArray()[0][i];
+		}
+		
+		return sum;
+	}
+	private double similarity(double[] featureone, double[] featuretwo) {
 
-	
 
-	
+		Matrix user1  = new Matrix(new double[1][featureone.length]);
+		Matrix user2 = new Matrix (new double[1][featuretwo.length]);
+		double average1 = average(featureone);
+		double average2 = average(featuretwo);
+		
+		Matrix averageVector1 = new Matrix(1, featureone.length, average1);
+		Matrix averageVector2 = new Matrix(1, featuretwo.length, average2);
+
+		user1.getArray()[0] = featureone;
+		user2.getArray()[0] = featuretwo;
+		Matrix diff1 = user1.minus(averageVector1);
+		Matrix diff2 = user2.minus(averageVector2);		
+		double topp = multiplyIndividualValuesAndSum(diff1, diff2);
+		double bottom = (diff1.normF()) * (diff2.normF());
+		return topp/bottom;
+	}
+	public ArrayList<Advertisement> getClosestAdvertisements(int n) {
+		Advertisements advertisements = Advertisements.getInstance();
+		ArrayList<Double> similarities = new ArrayList<Double>();
+		ArrayList<Advertisement> releventAds = new ArrayList<Advertisement>();
+		for (Advertisement advertisement : advertisements.getAdvertisements()) {
+			similarities.add(similarity(getNewFeatures(), advertisement.getFeatures()));
+		}
+		ArrayList<Double> similartiesSorted = (ArrayList<Double>) similarities.clone();
+		Collections.sort(similartiesSorted);
+		for (int i = similartiesSorted.size()-1; i > similartiesSorted.size()-(1+n); i--){
+			releventAds.add(advertisements.getAdvertisements().get(similarities.indexOf(similartiesSorted.get(i))));
+		}
+		return releventAds;
+	}
 }

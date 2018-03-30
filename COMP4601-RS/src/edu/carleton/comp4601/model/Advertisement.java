@@ -68,6 +68,7 @@ public class Advertisement {
 		for (int i = 0; i < indexes.length; i++) {
 			genres[i] = DictionaryAndFeatureGenerator.GENRES[indexes[i]];
 		}
+		
 		return genres;
 	}
 	
