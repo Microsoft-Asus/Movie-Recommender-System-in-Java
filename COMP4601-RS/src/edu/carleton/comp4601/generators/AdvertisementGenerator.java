@@ -13,9 +13,8 @@ import edu.carleton.comp4601.users.UserProfile;
 public class AdvertisementGenerator {
 	
 	
-	public static void generateAdvertisements() {
-		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
-		Kmeans kmeans = new Kmeans(7, profiles);
+	public static void generateAdvertisements(Kmeans kmeans) {
+
 		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
 		
 		for (String key : clusters.keySet()) {
@@ -32,13 +31,5 @@ public class AdvertisementGenerator {
 			Advertisements.getInstance().addAdvertisement(advertisement);
 		}
 		
-	}
-
-	public static void main(String[] args) {
-		AdvertisementGenerator.generateAdvertisements();
-		Advertisements advertisements = Advertisements.getInstance();
-		for (Advertisement advertisement : advertisements.getAdvertisements()) {
-			System.out.println(advertisement.getHtml());
-		}
 	}
 }
