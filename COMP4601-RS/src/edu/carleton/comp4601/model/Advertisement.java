@@ -1,6 +1,7 @@
 package edu.carleton.comp4601.model;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import edu.carleton.comp4601.generators.DictionaryAndFeatureGenerator;
 
@@ -80,5 +81,10 @@ public class Advertisement {
 	}
 	public String[] getGenres() {
 		return genres;
+	}
+	public String getAGenrePicture() {
+	    int rnd = new Random().nextInt(genres.length);
+	    String genre = genres[rnd];
+	    return "images/" + genre + ".jpg";
 	}
 }
