@@ -204,6 +204,21 @@ public class DatabaseManager {
 		}
 		return userProfiles;
 	}
+	public UserProfile loadUserByName(String username) {
+		switchCollection(USERPROFILE_COL);
+		DBCursor cur = col.find(new BasicDBObject("username", username));
+		DBObject searchObj = null;
+		if (cur.hasNext()) {
+			searchObj = cur.next();
+		}
+		DBObject obj = searchObj;
+		if (obj != null){
+			UserProfile user = new UserProfile((String)obj.get("username"), 
+					(ArrayList<Double>) obj.get("features"));
+			return user;
+		}
+		return null;
+	}
 	private ArrayList<String> getUsernames(ArrayList<UserProfile> userprofiles) {
 		ArrayList<String> usernames = new ArrayList<String>();
 		for (UserProfile userprofile : userprofiles) {
@@ -246,6 +261,19 @@ public class DatabaseManager {
 			obj = cursor.next();
 			clusters.put((String)obj.get("cluster"),
 					(ArrayList<String>) obj.get("users"));
+		}
+		return clusters;
+	}
+	public HashMap<String, ArrayList<UserProfile>> loadClustersFullUser() {
+		HashMap<String, ArrayList<String>> clustersNames = loadClusters();
+		HashMap<String, ArrayList<UserProfile>> clusters = new HashMap<String, ArrayList<UserProfile>>();
+		
+		for (String key : clustersNames.keySet()) {
+			ArrayList<UserProfile> users = new ArrayList<UserProfile>();
+			for (String username : clustersNames.get(key)) {
+				users.add(loadUserByName(username));
+			}
+			clusters.put(key, users);
 		}
 		return clusters;
 	}

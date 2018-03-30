@@ -27,10 +27,10 @@ public class RS {
 	private String name;
 
 	public RS() {
-		System.out.println("Contructor called");
 		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
-		Kmeans kmeans = new Kmeans(7, profiles);
-		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
+		//Kmeans kmeans = new Kmeans(7, profiles);
+		//HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
+		HashMap<String, ArrayList<UserProfile>> clusters = DatabaseManager.getInstance().loadClustersFullUser();
 		AdvertisementGenerator.generateAdvertisements(clusters);
 		name = "COMP4601 Recomender System V2.1: Julian and Laura";
 	}
@@ -80,7 +80,7 @@ public class RS {
 		for (String key : clusters.keySet()) {
 			htmlBuilder.append("<tr>");
 			htmlBuilder.append("<td>" + formatClusterTitle(key) + "</td>");
-			htmlBuilder.append("<td></td>");
+			htmlBuilder.append("</tr>");
 			for(String username : clusters.get(key)) {
 				htmlBuilder.append("<td>" + username + "</td>");
 				htmlBuilder.append("</tr>");
