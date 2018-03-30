@@ -101,8 +101,6 @@ public class DictionaryAndFeatureGenerator {
             if (i == 1000) break;
         	i++;
             words.add(entry.getKey());
-            //System.out.println(entry.getKey() + " " + entry.getValue());
-
         }
         return words;
     }
@@ -144,7 +142,7 @@ public class DictionaryAndFeatureGenerator {
 		///System.out.println(profiles.size());
 		Kmeans kmeans = new Kmeans(18, profiles);
 		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
-		DatabaseManager.getInstance().saveClustersToDb(clusters);
+		//DatabaseManager.getInstance().saveClustersToDb(clusters);
 		for (String key : clusters.keySet()) {
 			System.out.println("=========================> " + key);
 			for (UserProfile userprofile : clusters.get(key)) {

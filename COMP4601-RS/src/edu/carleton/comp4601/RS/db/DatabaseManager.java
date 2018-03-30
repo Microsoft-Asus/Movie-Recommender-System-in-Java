@@ -211,9 +211,23 @@ public class DatabaseManager {
 		}
 		return usernames;
 	}
+	private boolean dropClusters(){
+		switchCollection(CLUSTERS_COL);
+		BasicDBObject document = new BasicDBObject();
+		col.remove(document);
+		DBCursor cursor = col.find();
+		boolean success = false;
+		while (cursor.hasNext()) {
+		    col.remove(cursor.next());
+		    success = true;
+		}
+		return success;
+	}
+	
+	
 	public void saveClustersToDb(HashMap<String, ArrayList<UserProfile>> clusters) {
 		switchCollection(CLUSTERS_COL);
-		
+		dropClusters();
 		for (String key : clusters.keySet()) {
 			DBObject obj = BasicDBObjectBuilder
 					.start("cluster", key)

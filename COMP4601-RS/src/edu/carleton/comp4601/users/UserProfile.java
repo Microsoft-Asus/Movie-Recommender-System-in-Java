@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import Jama.Matrix;
 import edu.carleton.comp4601.generators.DictionaryAndFeatureGenerator;
 import edu.carleton.comp4601.lucene.Lucene;
 import edu.carleton.comp4601.model.Advertisement;
 import edu.carleton.comp4601.model.Advertisements;
-import net.sf.javaml.utils.ArrayUtils;
 
 
 public class UserProfile {
@@ -128,6 +129,15 @@ public class UserProfile {
 		double topp = multiplyIndividualValuesAndSum(diff1, diff2);
 		double bottom = (diff1.normF()) * (diff2.normF());
 		return topp/bottom;
+	}
+	public String getNewFeaturesString() {
+		double[] newfeatures = getNewFeatures();
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(newfeatures[0]);
+		for (int i = 1; i < newfeatures.length; i++) {
+			stringBuilder.append("," + newfeatures[i]);
+		}
+		return stringBuilder.toString();
 	}
 	public ArrayList<Advertisement> getClosestAdvertisements(int n) {
 		Advertisements advertisements = Advertisements.getInstance();
