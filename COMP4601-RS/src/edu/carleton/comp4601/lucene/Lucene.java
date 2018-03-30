@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -134,6 +136,12 @@ public class Lucene {
 		
 		return stopSet;
 	}
+	
+	private String queryPage(String movieId) throws IOException{
+		String path = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/pages/" + movieId + ".html";
+		String contents = new String(Files.readAllBytes(Paths.get(path))); 		
+		return contents;	
+	}
 
 	
 	private void indexADoc(File file) throws IOException	{	
@@ -222,8 +230,7 @@ public class Lucene {
 	}
 	public static void main(String[] args) {
 		Lucene luc = Lucene.getInstance();
+	
 		//luc.indexLucene();
-
-
 	}
 }
