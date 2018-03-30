@@ -13,10 +13,8 @@ import edu.carleton.comp4601.users.UserProfile;
 public class AdvertisementGenerator {
 	
 	
-	public static void generateAdvertisements(Kmeans kmeans) {
+	public static void generateAdvertisements(HashMap<String, ArrayList<UserProfile>> clusters) {
 
-		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
-		
 		for (String key : clusters.keySet()) {
 			ArrayList<UserProfile> users = clusters.get(key);
 			Matrix accumMatrix = new Matrix(1,DictionaryAndFeatureGenerator.GENRES.length);

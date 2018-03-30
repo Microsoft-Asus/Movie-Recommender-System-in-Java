@@ -1,6 +1,7 @@
 package edu.carleton.comp4601.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.carleton.comp4601.RS.db.DatabaseManager;
 import edu.carleton.comp4601.data.util.Kmeans;
@@ -14,8 +15,9 @@ public class Launcher {
 	public static void main(String[] args) {
 		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		Kmeans kmeans = new Kmeans(7, profiles);
+		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
 		
-		AdvertisementGenerator.generateAdvertisements(kmeans);
+		AdvertisementGenerator.generateAdvertisements(clusters);
 		Advertisements advertisements = Advertisements.getInstance();
 		ArrayList<UserProfile> users = DatabaseManager.getInstance().loadUserProfiles();
 		System.out.println("All ads");
@@ -24,7 +26,7 @@ public class Launcher {
 		}
 		
 		System.out.println("User test");
-		UserProfile testUser = users.get(545);
+		UserProfile testUser = users.get(547);
 		ArrayList<Advertisement> releventAds = testUser.getClosestAdvertisements(2);
 		System.out.println(testUser.getUsername());
 		System.out.println(testUser.getFavouriteGenre());
