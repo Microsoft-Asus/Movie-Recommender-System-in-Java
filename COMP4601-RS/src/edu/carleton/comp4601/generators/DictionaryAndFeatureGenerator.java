@@ -1,4 +1,4 @@
-package edu.carleton.comp4601.dictonary;
+package edu.carleton.comp4601.generators;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -142,9 +142,9 @@ public class DictionaryAndFeatureGenerator {
 		//dg.generateFeaturesForUsers();
 		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		///System.out.println(profiles.size());
-		Kmeans kmeans = new Kmeans(10, profiles);
+		Kmeans kmeans = new Kmeans(18, profiles);
 		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
-		//DatabaseManager.getInstance().saveClustersToDb(clusters);
+		DatabaseManager.getInstance().saveClustersToDb(clusters);
 		for (String key : clusters.keySet()) {
 			System.out.println("=========================> " + key);
 			for (UserProfile userprofile : clusters.get(key)) {
