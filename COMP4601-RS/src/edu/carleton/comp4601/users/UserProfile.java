@@ -2,10 +2,10 @@ package edu.carleton.comp4601.users;
 
 import java.util.ArrayList;
 
-import edu.carleton.comp4601.dictonary.DictionaryAndFeatureGenerator;
+import Jama.Matrix;
+import edu.carleton.comp4601.generators.DictionaryAndFeatureGenerator;
 import edu.carleton.comp4601.lucene.Lucene;
 import net.sf.javaml.utils.ArrayUtils;
-import weka.core.Utils;
 
 
 public class UserProfile {
@@ -58,6 +58,13 @@ public class UserProfile {
 			newfeatures[getArrayIndex(features, featuresSorted[i])] = i;
 		}
 		return newfeatures;
+	}
+	public Matrix getNewFeaturesAsMatrix() {
+		double[] newfeatures = getNewFeatures();
+		Matrix featuresMat  = new Matrix(new double[1][newfeatures.length]);
+		featuresMat.getArray()[0] = newfeatures;
+		return featuresMat;
+
 	}
 	public void generateFeature(ArrayList<String> dict, String genre) {
 		float accum = 0;

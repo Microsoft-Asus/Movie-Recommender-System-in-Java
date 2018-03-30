@@ -1,4 +1,4 @@
-package edu.carleton.comp4601.dictonary;
+package edu.carleton.comp4601.generators;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

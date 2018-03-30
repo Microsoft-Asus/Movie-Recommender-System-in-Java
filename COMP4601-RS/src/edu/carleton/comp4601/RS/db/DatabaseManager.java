@@ -223,4 +223,16 @@ public class DatabaseManager {
 			col.save(obj);
 		}
 	}
+	public HashMap<String, ArrayList<String>> loadClusters() {
+		switchCollection(CLUSTERS_COL);
+		DBCursor cursor = col.find();
+		DBObject obj = null;
+		HashMap<String, ArrayList<String>> clusters = new HashMap<String, ArrayList<String>>();
+		while(cursor.hasNext()) {
+			obj = cursor.next();
+			clusters.put((String)obj.get("cluster"),
+					(ArrayList<String>) obj.get("users"));
+		}
+		return clusters;
+	}
 }
