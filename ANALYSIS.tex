@@ -1,0 +1,81 @@
+\documentclass{article}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{fullpage}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{esvect}
+\usepackage{tikz}
+\usepackage{ esint }
+\usepackage{ tipa }
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\newcommand\encircle[1]{%
+  \tikz[baseline=(X.base)] 
+    \node (X) [draw, shape=circle, inner sep=0] {\strut #1};}
+\title{COMP4601 Assignment 2 Write up}
+\author{Julian Clayton, 100892373 \and  Laura McDougall, 100909799}
+
+\date{March 22 2018}
+\begin{document}
+
+\maketitle
+
+\section{Initial Misconceptions}
+\textbf{Using Amazon to classify the reviews}\newline
+Initially we noticed the the reviews were retrieved from Amazon and thought that we could use this to classify the data. This clearly would only work on the training set supplied for this course and would subsequently fail if we introduced reviews that are not from Amazon. Nonetheless, we decided that because these reviews are easily found on Amazon that  we may use this for training the system in the future \newline\newline
+\textbf{Extremely sparse matrices for review terms}\newline
+This project, being a recommender system, requires the use of a large Vector Space Model. Initially we were going to design the system to index all of the words used in all of the reviews and find the term-frequency for each word in each of the users reviews.  Each user would then correspond to a vector that contains the frequency of every word used by that user. Under the presupposition that users who like to review similar movies would use similar lexicons we could use this to classify reviews and thus users. We decided against this design due to size of the matrices constructed; the size of the dictionary vector would be equal to the cardinality of the set of all words used in all reviews. Nonetheless, as will be outlined in the subsequent section, we went with a similar design to this. 
+\section{Final Design Overview}
+Conceptually, the final  design can be abstracted into 2 separate components: \newline\newline
+\textbf{1.}\space Dictionary Creation\newline
+We decided to generate a list of keywords for 12 main movie genres and we refer to these lists as dictionaries. These keywords were to be used to generate the features for each userprofile.\newline 
+\textbf{2.}\space User Feature Creation\newline
+In order to compare the similarities between users we needed to generate a vector corresponding to what movies a user likes to review \newline\newline
+These components are detailed below:
+\subsection{Dictionary Creation}
+We realized early into this assignment that the reviews included in the \textit{pages} directory could be linked back to their corresponding Amazon review. Thus we were able to use this to generate lists of relevant keywords for each of the 11 genres we chose. The dictionary generation works as follows: \textbf{1} Get all the reviews for for a each genre, \textbf{2} find the most used words for that genre (minus the stop words) 3) Use the most used words in each genre as the dictionary. The detailed algorithm is below:\newline\newline\newline\newline\newline\newline\newline1)\tab  GENERATE-DICT(List-of-Movies $movies$):\newline
+2)\tab\tab genre-reviews := MAP(genre $\rightarrow$ reviews ) \newline
+2)\tab\tab genre-dict := MAP(genre $\rightarrow $ dict )\newline
+2)\tab\tab for each ($movie$ in $movies$ ):\newline
+3)\tab\tab\tab $genre$ := GET-GENRE($movie$)*\newline
+4)\tab\tab\tab $reviews$ := GET-ALL-REVIEWS($movie$)**\newline
+6)\tab\tab\tab put INTO genre-reviews ($genre$ $\rightarrow$ $reviews$)\newline
+7)\tab\tab for each key in the keyset of genre-reviews:\newline
+8)\tab\tab\tab $allreviews$ := genre-reviews.GET($key$)\newline
+9)\tab\tab\tab $dict$ := MOST-USED-WORDS($allreviews$, 1000)***\newline
+10)\tab\tab\tab put INTO genre-dict ($genre$ $\rightarrow$ $dict$)\newline
+11)\tab RETURN genre-dict\newline\newline
+* Where GET-GENRE retrieves the genre for a movie via Amazon\newline
+** Where GET-ALL-REVIEWS amalgamates all the reviews for a given movie into a single string.\newline
+*** Where MOST-USED-WORDS(n, words) gets the $n$ most used words in a review minus the stop-words in stopwords.txt\newline\newline
+After these dictionaries were generated we could tweak them a little bit by adding words to the stopwords.txt file. Eventually dictionaries were generated that could classify reviews with good accuracy.
+\subsection{User Feature Creation}
+Once the dictionaries were created we could get the tf-idf value for every word in each dictionary then average them out for each dictionary. The average tf-idf value for each genre is then stored as the features for each user.Thus the equation to determine each feature for a user can be expressed as:
+$$F_{i,j} = \frac{\sum\limits_{w \in D} T(U_i, w)}{|D|}$$
+Where, $F_{i,j}$ is feature $j$ for user $i$.\newline
+$U_i$ is user $i$\newline
+$D_j$ is the dictionary for feature $j$, because each feature corresponds with a genre. \newline
+$w$ is a word. \newline
+And function $T(user, word)$ is the tf-idf value for that word for all the reviews by that user\newline\newline
+\textbf{Issues With Above Method of Feature Generation and Workaround}\newline
+Because we used a dictionary generated from a large and random set of Amazon reviews some of the reviews we generated features for would have very high TF-IDF if they were included in our dictionary generation.Nonetheless, whichever feature had the highest score, the index of this would correspond with the genre of movie that the user liked to review the most. Thus, we generated a new set of features for each user that would instead indicate which genre of movie the user reviewed the most. For example a user with features $0,6,5,4,2,3,11,10,9,7,8,1$ indicates that they like the genre corresponding to index $0$ the most (Drama) and the genre at index $11$ the second most (Comedy) with the genre at index $6$ the least (Adventure).  
+\section{Communities Discovered and Advertisements}
+Once each user-profile had \textit{meaningful} features we were able to perform k-means on the users to discover communities. Next, in order to discover what genres each community was liked the most we calculated the average features for each community. \textit{Action} proved to be the most popular genre among different communities with potentially several communities having it as their absolute favourite genre. Nonetheless, if several communities had their favourite genre as Action, their second and third favourite genres would always be different. Some communities would like \textit{Action} foremost, followed by \textit{Horror} while other communities would have \textit{Sci-fi} or \textit{Crime} as their second favourite genres.\newline\newline
+\textbf{Generating Advertisements for Each Community}\newline
+After averaging the features of each community, advertisements were created with the average features for each community. The advertisements can be created with a certain degree of accuracy and will currently generate advertisements for the top three favourite genres for that community. This can provide much more accurate advertisement suggestions as most movies usually encompass more than one genre. When choosing an advertisement for a user we compute the cosine similarity between a user and every available advertisement, where the number of advertisements is equal to the number of communities. The most similar advertisement will be recommended to the user and will be tailored to that users favourite genres.From this advertisement we choose a random permutation of the genres encompassed by this advertisement. Because we compute the cosine-similarity between the users and the actual advertisements, there is a small chance that a user might receive an advertisement that is not for their community. Nonetheless, an advertisement recommended to a particular user will be relevant to that user regardless if the advertisement is for a different community. \newline\newline
+Overall, the advertisement algorithm executed when the endpoint  /fetch/{user}/{page} is called can be expressed as follows:\newline
+1)\tab  GENERATE-AD(USER $user$):\newline
+2)\tab\tab for each $ad$ in $ads$:\newline
+3)\tab\tab\tab find the most similar $ad$ to $user$\newline
+4)\tab\tab $chosenad$ := most similar ad\newline
+5)\tab RETURN a random permutation of random length of some or all of the genres in $chosenad$\newline\newline
+Ideally, here we would be able to find a movie with the exact genres returned and recommend it to the user. 
+\section{\textbf{SUGGEST} Algorithm}
+1)\tab  SUGGEST($G(V, E)$, newuser $u$):\newline
+2)\tab\tab for each $ad$ in $ads$:\newline
+3)\tab\tab\tab find the most similar $ad$ to $user$\newline
+4)\tab\tab $chosenad$ := most similar ad\newline
+5)\tab RETURN a random permutation of random length of some or all of the genres in $chosenad$\newline\newline
+\end{document}
