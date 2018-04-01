@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import edu.carleton.comp4601.RS.db.DatabaseManager;
+import edu.carleton.comp4601.RS.parser.MovieParser;
 import edu.carleton.comp4601.data.util.Kmeans;
 import edu.carleton.comp4601.lucene.Lucene;
 import edu.carleton.comp4601.model.Dictionary;
@@ -69,6 +70,7 @@ public class DictionaryAndFeatureGenerator {
 		dbm.loadReviews();
 		ArrayList<GenreReview> reviews = GenreReviews.getInstance().getReviews();
 		for (GenreReview review : reviews) {
+			System.out.println("adding review");
 			ArrayList<String> topWords = countWordsInString(review.getReviews());
 			dbm.addDictionaryToDb(topWords, review);
 		}
@@ -120,6 +122,22 @@ public class DictionaryAndFeatureGenerator {
 			dbm.saveUserProfileToDatabase(user);
 		}
 	}
+	public void generateFeaturesForUsers(int lowerbound, int upperbound) {
+		System.out.println("Generating Features");
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		ArrayList<String> usernames = Lucene.getInstance().getUsers();
+		ArrayList<Dictionary> dictionaries = dbm.loadDictionariesFromDb();
+		for (int i = lowerbound; i < upperbound; i++) {
+			System.out.println("Generating features for: " + usernames.get(i));
+			UserProfile user = new UserProfile(usernames.get(i));
+			for (Dictionary dict : dictionaries) {
+				System.out.println("For dictionary: " + dict.getGenre());
+				user.generateFeature(dict.getDictionary(), dict.getGenre());
+			}
+			System.out.println("Saving " + user.getUsername() + " to db");
+			dbm.saveUserProfileToDatabase(user);
+		}
+	}
 	public static DictionaryAndFeatureGenerator getInstance() {
 		if (instance == null)
 			instance = new DictionaryAndFeatureGenerator();
@@ -134,15 +152,28 @@ public class DictionaryAndFeatureGenerator {
 		}
 		return index;
 	}
-	public static void main(String[] args) {
-		DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
-		dg.generateDictionaryForGenres();
+	public static void initSytem(int numclusters) {
+		//DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
+		//dg.generateDictionaryForGenres();
 		//dg.generateFeaturesForUsers();
+		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
+		System.out.println(profiles.size());
+		Kmeans kmeans = new Kmeans(numclusters, profiles);
+		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
+		DatabaseManager.getInstance().saveClustersToDb(clusters);
+	}
+	public static void main(String[] args) {
+		//MovieParser.initMovies();
+		//DictionaryAndFeatureGenerator dg = DictionaryAndFeatureGenerator.getInstance();
+		//dg.initiateWordBanks();
+		//dg.generateDictionaryForGenres();
+		//dg.generateFeaturesForUsers();
+		
 		//ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		///System.out.println(profiles.size());
 		//Kmeans kmeans = new Kmeans(18, profiles);
 		//HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
 		//DatabaseManager.getInstance().saveClustersToDb(clusters);
-		
+		initSytem(8);
 	}
 }

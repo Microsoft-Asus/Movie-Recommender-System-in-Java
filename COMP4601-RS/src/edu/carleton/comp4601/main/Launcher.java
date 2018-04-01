@@ -16,7 +16,7 @@ public class Launcher {
 		ArrayList<UserProfile> profiles = DatabaseManager.getInstance().loadUserProfiles();
 		Kmeans kmeans = new Kmeans(7, profiles);
 		HashMap<String, ArrayList<UserProfile>> clusters = kmeans.algorithm();
-		
+		DatabaseManager.getInstance().saveClustersToDb(clusters);
 		AdvertisementGenerator.generateAdvertisements(clusters);
 		Advertisements advertisements = Advertisements.getInstance();
 		ArrayList<UserProfile> users = DatabaseManager.getInstance().loadUserProfiles();

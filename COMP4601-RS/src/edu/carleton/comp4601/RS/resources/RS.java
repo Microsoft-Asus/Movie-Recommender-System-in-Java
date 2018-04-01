@@ -21,6 +21,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import edu.carleton.comp4601.RS.db.DatabaseManager;
 import edu.carleton.comp4601.generators.AdvertisementGenerator;
+import edu.carleton.comp4601.generators.DictionaryAndFeatureGenerator;
 import edu.carleton.comp4601.lucene.Lucene;
 import edu.carleton.comp4601.model.Advertisement;
 import edu.carleton.comp4601.model.Advertisements;
@@ -90,6 +91,9 @@ public class RS {
 		htmlBuilder.append("<html>");
 		htmlBuilder.append("<head><title> Reset </title></head>");
 		htmlBuilder.append("<h1> Initializing data at " + directory + " </h1>");
+		DictionaryAndFeatureGenerator.initSytem(8);
+
+		
 		
 		return htmlBuilder.toString();
 	}

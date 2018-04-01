@@ -30,6 +30,27 @@ public class MovieParser {
 				if (genres != null) {
 					DatabaseManager.getInstance().addMovieToDb(movieIds.get(i), title, review, genres);
 				}
+				Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+			}
+		}	
+	}
+	public static void initMovies() {
+		File[] movieFiles = getMovieFiles();
+		ArrayList<String> movieIds = parseIds(movieFiles);
+		for (int i = 0; i <  movieIds.size();i++){
+			try {		
+				Document doc = Jsoup.connect(buildUrl(movieIds.get(i))).get();
+				String title = parseTitle(doc);
+				List<String> genres = MovieSearcher.searchForMovie(title);
+				String review = getAllReviewsText(Jsoup.parse(movieFiles[i], "UTF-8"));
+				System.out.println(review);
+				if (genres != null) {
+					DatabaseManager.getInstance().addMovieToDb(movieIds.get(i), title, review, genres);
+				}
 				Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -38,7 +59,6 @@ public class MovieParser {
 			}
 		}	
 	}
-	
 	private static String parseTitle(Document doc){
 		String t = "";
 		Elements titleElement = doc.getElementsByTag("title");

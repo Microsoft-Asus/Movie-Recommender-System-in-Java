@@ -17,7 +17,7 @@
 \title{COMP4601 Assignment 2 Write up}
 \author{Julian Clayton, 100892373 \and  Laura McDougall, 100909799}
 
-\date{March 22 2018}
+\date{April 1 2018}
 \begin{document}
 
 \maketitle
@@ -53,7 +53,7 @@ We realized early into this assignment that the reviews included in the \textit{
 After these dictionaries were generated we could tweak them a little bit by adding words to the stopwords.txt file. Eventually dictionaries were generated that could classify reviews with good accuracy.
 \subsection{User Feature Creation}
 Once the dictionaries were created we could get the tf-idf value for every word in each dictionary then average them out for each dictionary. The average tf-idf value for each genre is then stored as the features for each user.Thus the equation to determine each feature for a user can be expressed as:
-$$F_{i,j} = \frac{\sum\limits_{w \in D} T(U_i, w)}{|D|}$$
+$$F_{i,j} = \frac{\sum\limits_{w \in D_j} T(U_i, w)}{|D_j|}$$
 Where, $F_{i,j}$ is feature $j$ for user $i$.\newline
 $U_i$ is user $i$\newline
 $D_j$ is the dictionary for feature $j$, because each feature corresponds with a genre. \newline
@@ -68,14 +68,24 @@ After averaging the features of each community, advertisements were created with
 Overall, the advertisement algorithm executed when the endpoint  /fetch/{user}/{page} is called can be expressed as follows:\newline
 1)\tab  GENERATE-AD(USER $user$):\newline
 2)\tab\tab for each $ad$ in $ads$:\newline
-3)\tab\tab\tab find the most similar $ad$ to $user$\newline
-4)\tab\tab $chosenad$ := most similar ad\newline
+3)\tab\tab\tab find the most similar $ad$ to $user$ using cosine similarity\newline
+4)\tab\tab\tab $chosenad$ := most similar ad\newline
 5)\tab RETURN a random permutation of random length of some or all of the genres in $chosenad$\newline\newline
 Ideally, here we would be able to find a movie with the exact genres returned and recommend it to the user. 
 \section{\textbf{SUGGEST} Algorithm}
+We will make two assumptions for this algorithm:\newline
+\encircle{1} The user is already connected to users in the social graph\newline
+\encircle{2} The user does not have any reviews them-self. \newline\newline
+We can thus devise an algorithm that finds the similarity between who the $newuser$ is connected to and who other users are connected with. Once we find a user, or several users, who are connected to similar users that $newuser$ is connected to then we can recommend $newuser$ movies that have been reviewed by those similar to $newuser$.\newline\newline 
 1)\tab  SUGGEST($G(V, E)$, newuser $u$):\newline
-2)\tab\tab for each $ad$ in $ads$:\newline
-3)\tab\tab\tab find the most similar $ad$ to $user$\newline
-4)\tab\tab $chosenad$ := most similar ad\newline
-5)\tab RETURN a random permutation of random length of some or all of the genres in $chosenad$\newline\newline
+2)\tab\tab $adjmatrix$ := CONTRUCT-ADJACENCY-MATRIX($G$) \newline
+3)\tab\tab $similarities$ := $\{ \emptyset \}$\newline
+2)\tab\tab for each $column$ in $adjmatrix$:\newline
+3)\tab\tab\tab $similarities$ := $similarities \cup \{ COSINE\_SIM(user, column)\}$*\newline
+4)\tab\tab $similar\_user$ := $MAX(similarities)$\newline
+5)\tab RETURN a movie that $similar\_user$ has reviewed.\newline\newline
+Of course this algorithm can be modified to return $n$ most similar users. This would be especially useful if the most similar user to $newuser$ has not reviewed any movies. \newline\newline
+Furthermore, the adjacency matrix could be used to recommend similar users by predicting if a user would want to be 'connected' with another user using collaborative filtering to predict entries in the adjacency matrix. \newline
+This SUGGEST algorithm would work well in our current system for those users whom do not yet have reviews. If we were to switch our entire recommender system to this method, we would be switching from a content-based recommender system to a user-based recomemender system. 
 \end{document}
+

@@ -34,7 +34,7 @@ import org.apache.lucene.util.Version;
 import org.apache.lucene.misc.*;
 
 public class Lucene {
-	private static final String INDEX_DIR =  "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/Lucene"; 
+	private static final String INDEX_DIR =  "/Users/julianclayton/Documents/workspace/COMP4601-A2/Lucene"; 
 	private static String FILES_DIR; 
 	private static String USER_PATH;
 	private static FSDirectory dir;
@@ -60,8 +60,8 @@ public class Lucene {
 	}
 	
 	public Lucene (){
-		FILES_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/data/reviews";
-		USER_PATH = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Assignment2/COMP4601-A2/COMP4601-RS/data/users";
+		FILES_DIR = "/Users/julianclayton/Documents/workspace/COMP4601-A2/COMP4601-RS/data/reviews";
+		USER_PATH = "/Users/julianclayton/Documents/workspace/COMP4601-A2/COMP4601-RS/data/users";
 		instance = this;	
 		users = new ArrayList<String>();
 }
