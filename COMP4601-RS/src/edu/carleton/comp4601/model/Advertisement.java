@@ -13,10 +13,11 @@ public class Advertisement {
 	private String[] genres;
 	private String id;
 	
-	public Advertisement(double[] features) {
+	public Advertisement(double[] features, String key) {
 		this.features = features;
 		this.genres = extractGenres(features, ADVERTISEMENT_ACCURACY);
 		this.html = generateHTML();
+		this.id = "C-"+key.substring(key.length() - 1);
 	}
 	
 	private String generateHTML() {

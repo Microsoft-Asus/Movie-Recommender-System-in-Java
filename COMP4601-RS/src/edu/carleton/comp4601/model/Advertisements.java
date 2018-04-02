@@ -20,7 +20,7 @@ public class Advertisements {
 	
 	public void addAdvertisement(Advertisement advertisement) {
 		advertisements.add(advertisement);
-		advertisement.setId("C-" + advertisements.indexOf(advertisement));
+		//advertisement.setId("C-" + advertisements.indexOf(advertisement));
 	}
 	public ArrayList<Advertisement> getAdvertisements() {
 		return advertisements;

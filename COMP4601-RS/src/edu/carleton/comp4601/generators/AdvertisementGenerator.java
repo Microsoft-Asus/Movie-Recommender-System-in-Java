@@ -25,7 +25,7 @@ public class AdvertisementGenerator {
 				accumMatrix.getArray()[0][i] = accumMatrix.getArray()[0][i] / users.size();
 			}
 			
-			Advertisement advertisement = new Advertisement(accumMatrix.getArray()[0]);
+			Advertisement advertisement = new Advertisement(accumMatrix.getArray()[0], key);
 			Advertisements.getInstance().addAdvertisement(advertisement);
 		}
 		
